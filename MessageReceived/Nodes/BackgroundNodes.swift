@@ -44,8 +44,3 @@ func mediumStars(size: CGSize) -> SKSpriteNode {
     slowStarsNode.size = CGSize(width: size.width, height: size.height)
     return slowStarsNode
 }
-
-//func streakParticles() -> SKEmitterNode {
-//
-//}
-

@@ -13,12 +13,14 @@ class GameScene: SKScene {
     
     let playableRect: CGRect
     let cameraNode = SKCameraNode()
+    var spaceshipNode = SpaceshipNode()
     
     override init(size: CGSize) {
-        let maxAspectRatio: CGFloat = 9/19.5
-        let playableHeight = size.height / maxAspectRatio
-        let playableMargin = (size.width-playableHeight)/2.0
+        let maxAspectRatio: CGFloat = 3/4
+        let playableHeight = size.width / maxAspectRatio
+        let playableMargin = (size.height-playableHeight)/2.0
         playableRect = CGRect(x: 0, y: playableMargin, width: size.width, height: playableHeight)
+        print(playableRect)
         super.init(size: size)
     }
     
@@ -37,15 +39,38 @@ class GameScene: SKScene {
         setupBackground()
         setupSlowStars()
         setupMediumStars()
-        setupStreak()
+        setupStreakParticles()
+        setupSpaceship()
         
         addChild(cameraNode)
         camera = cameraNode
         cameraNode.position = CGPoint(x: size.width/2, y: size.height/2)
+        debugDrawPlayableArea()
+        startGame()
+    }
+    
+    func debugDrawPlayableArea() {
+        let shape = SKShapeNode(rect: playableRect)
+        shape.strokeColor = SKColor.red
+        shape.lineWidth = 4.0
+        addChild(shape)
+    }
+    
+    func setupSpaceship() {
+        spaceshipNode.zPosition = 1
+        spaceshipNode.position = CGPoint(x: size.width/2, y: 200)
+        addChild(spaceshipNode)
+    }
+    
+    func startGame() {
+        // start debris
+    }
+    
+    func cameraShake() {
         
     }
     
-    // Background Setup
+    // MARK: - Background Setup
     func setupBackground() {
         for i in 0...1 {
             let background = backgroundNode(size: size)
@@ -70,13 +95,13 @@ class GameScene: SKScene {
         }
     }
     
-    func setupStreak() {
+    func setupStreakParticles() {
         guard let emitter = SKEmitterNode(fileNamed: "Streak.sks") else { return }
         emitter.position = CGPoint(x: size.width/2, y: size.height)
         addChild(emitter)
     }
     
-    // Background Movement
+    // MARK: - Background Movement
     func moveBackground() {
         enumerateChildNodes(withName: "background") { node, _ in
             let background = node as! SKSpriteNode
@@ -107,9 +132,11 @@ class GameScene: SKScene {
         }
     }
     
+    // MARK: - Update
     override func update(_ currentTime: TimeInterval) {
         moveBackground()
         moveSlowStars()
         moveMediumStars()
     }
+    
 }
