@@ -20,6 +20,7 @@
 		8B798C2C201BEB4C00433828 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8B798C2A201BEB4C00433828 /* Assets.xcassets */; };
 		8BE3AF06201C4DD1005C207E /* MyUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE3AF05201C4DD1005C207E /* MyUtils.swift */; };
 		8BE3AF08201C6633005C207E /* AsteroidBreak.sks in Resources */ = {isa = PBXBuildFile; fileRef = 8BE3AF07201C6633005C207E /* AsteroidBreak.sks */; };
+		8BE3AF0A201C71FA005C207E /* MessageReceived.sks in Resources */ = {isa = PBXBuildFile; fileRef = 8BE3AF09201C71FA005C207E /* MessageReceived.sks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 		8B798C2A201BEB4C00433828 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8BE3AF05201C4DD1005C207E /* MyUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyUtils.swift; sourceTree = "<group>"; };
 		8BE3AF07201C6633005C207E /* AsteroidBreak.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = AsteroidBreak.sks; sourceTree = "<group>"; };
+		8BE3AF09201C71FA005C207E /* MessageReceived.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MessageReceived.sks; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +102,7 @@
 				8B798C29201BEB4C00433828 /* Streak.sks */,
 				8B798C2A201BEB4C00433828 /* Assets.xcassets */,
 				8BE3AF07201C6633005C207E /* AsteroidBreak.sks */,
+				8BE3AF09201C71FA005C207E /* MessageReceived.sks */,
 			);
 			path = Particles;
 			sourceTree = "<group>";
@@ -169,6 +172,7 @@
 				8B798C2B201BEB4C00433828 /* Streak.sks in Resources */,
 				8B798C1B201B38FC00433828 /* LaunchScreen.storyboard in Resources */,
 				8B798C2C201BEB4C00433828 /* Assets.xcassets in Resources */,
+				8BE3AF0A201C71FA005C207E /* MessageReceived.sks in Resources */,
 				8B798C0F201B38FC00433828 /* Actions.sks in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

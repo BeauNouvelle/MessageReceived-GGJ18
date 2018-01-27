@@ -14,12 +14,18 @@ class GameScene: SKScene {
     let playableRect: CGRect
     let cameraNode = SKCameraNode()
     var spaceshipNode = SKSpriteNode(imageNamed: "spaceship")
+    let hud = HUD()
     
     let shipMovePointsPerSec: CGFloat = 300
     let shipRotateRadiansPerSec: CGFloat = 4.0 * π
     
     var touchDelay = 0.0
-    var distanceTravelled = 0.0
+    var distanceTravelled = 0.0 {
+        didSet {
+            hud.distanceTravelledLabel.text = "\(distanceTravelled)"
+        }
+    }
+    var shipLife = 100
 
     var velocity = CGPoint.zero
     
@@ -53,6 +59,7 @@ class GameScene: SKScene {
         setupStreakParticles()
         setupSpaceship()
         setupDeadZone()
+        setupHUD()
         
         addChild(cameraNode)
         camera = cameraNode
@@ -64,7 +71,6 @@ class GameScene: SKScene {
         }
         let spawnAsteroidSequence = SKAction.sequence([spawnAsteroidAction, SKAction.wait(forDuration: 2.0, withRange: 2.0)])
         run(SKAction.repeatForever(spawnAsteroidSequence))
-        
     }
     
     func debugDrawPlayableArea() {
@@ -72,6 +78,11 @@ class GameScene: SKScene {
         shape.strokeColor = SKColor.red
         shape.lineWidth = 4.0
         addChild(shape)
+    }
+    
+    func setupHUD() {
+        hud.position = CGPoint(x: size.width/2, y: playableRect.height-50)
+        addChild(hud)
     }
     
     func setupSpaceship() {
@@ -213,7 +224,7 @@ class GameScene: SKScene {
         }
     }
     
-    // MARK: - Bounds Check
+    // MARK: - Ship Bounds Check
     func boundsCheckSpaceship() {
         let bottomLeft = CGPoint(x: playableRect.minX, y: playableRect.minY)
         let topRight = CGPoint(x: playableRect.maxX, y: playableRect.maxY)
@@ -253,6 +264,7 @@ class GameScene: SKScene {
     func sceneTouched(touchLocation:CGPoint) {
         let delayAction = SKAction.wait(forDuration: touchDelay)
         let moveBlock = SKAction.run { [weak self] in
+            self?.shipRecievedMessage()
             self?.moveShipToward(location: touchLocation)
         }
         print(touchDelay)
@@ -289,15 +301,18 @@ class GameScene: SKScene {
         moveSlowStars()
         moveMediumStars()
         boundsCheckSpaceship()
+        
         distanceTravelled += 1
-        touchDelay = distanceTravelled * 0.0002
+        touchDelay = distanceTravelled * 0.0001
     }
     
-    // MARK: - Other
+    // MARK: - Actions
     func destroyAsteroidAnimation(at position: CGPoint) {
         guard let emitter = SKEmitterNode(fileNamed: "AsteroidBreak.sks") else { return }
         emitter.position = position
         addChild(emitter)
+        let removeAction = SKAction.sequence([SKAction.wait(forDuration: 2), SKAction.removeFromParent()])
+        emitter.run(removeAction)
     }
     
     func shake(initialPosition: CGPoint, duration:Float, amplitudeX:Int = 12, amplitudeY:Int = 3) -> SKAction {
@@ -314,6 +329,34 @@ class GameScene: SKScene {
         return SKAction.sequence(actionsArray)
     }
     
+    func shipRecievedMessage() {
+        guard let pulse = SKEmitterNode(fileNamed: "MessageReceived.sks") else { return }
+        pulse.position = CGPoint(x: -7, y: 170)
+        pulse.name = "pulse"
+        spaceshipNode.addChild(pulse)
+        let removeAction = SKAction.sequence([SKAction.wait(forDuration: 2), SKAction.removeFromParent()])
+        pulse.run(removeAction)
+    }
+    
+    func damageShip() {
+        shipLife -= 20
+        if shipLife < 0 {
+            // play ship blow up animation.
+            gameOver()
+        }
+    }
+    
+    // MARK: - Game state
+    func gameOver() {
+        restart()
+    }
+    
+    func restart() {
+        touchDelay = 0.0
+        distanceTravelled = 0.0
+        shipLife = 100
+    }
+    
 }
 
 extension GameScene: SKPhysicsContactDelegate {
@@ -328,6 +371,7 @@ extension GameScene: SKPhysicsContactDelegate {
             destroyAsteroidAnimation(at: explosionLocation)
             contact.bodyB.node?.removeFromParent()
             cameraNode.run(shake(initialPosition: cameraNode.position, duration: 0.5, amplitudeX: 30, amplitudeY: 4))
+            damageShip()
         }
     }
 }
