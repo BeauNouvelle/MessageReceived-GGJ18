@@ -13,14 +13,21 @@ class GameScene: SKScene {
     
     let playableRect: CGRect
     let cameraNode = SKCameraNode()
-    var spaceshipNode = SpaceshipNode()
+    var spaceshipNode = SKSpriteNode(imageNamed: "spaceship")
+    
+    let shipMovePointsPerSec: CGFloat = 300
+    let shipRotateRadiansPerSec: CGFloat = 4.0 * π
+    
+    var touchDelay = 0.0
+    var distanceTravelled = 0.0
+
+    var velocity = CGPoint.zero
     
     override init(size: CGSize) {
         let maxAspectRatio: CGFloat = 3/4
         let playableHeight = size.width / maxAspectRatio
-        let playableMargin = (size.height-playableHeight)/2.0
-        playableRect = CGRect(x: 0, y: playableMargin, width: size.width, height: playableHeight)
-        print(playableRect)
+        let playableWidth = (size.width * maxAspectRatio)
+        playableRect = CGRect(x: 250, y: 50, width: playableWidth-100, height: playableHeight-100)
         super.init(size: size)
     }
     
@@ -29,24 +36,35 @@ class GameScene: SKScene {
     }
     
     var cameraRect : CGRect {
-        let x = cameraNode.position.x - size.width/2 + (size.width - playableRect.width)/2
-        let y = cameraNode.position.y - size.height/2 + (size.height - playableRect.height)/2
+        let x = cameraNode.position.x - size.width/2
+        let y = cameraNode.position.y - size.height/22
         return CGRect(x: x, y: y, width: playableRect.width, height: playableRect.height)
     }
         
     override func didMove(to view: SKView) {
         backgroundColor = SKColor.white
+        
+        physicsWorld.contactDelegate = self
+        physicsWorld.gravity = CGVector.zero
+
         setupBackground()
         setupSlowStars()
         setupMediumStars()
         setupStreakParticles()
         setupSpaceship()
+        setupDeadZone()
         
         addChild(cameraNode)
         camera = cameraNode
         cameraNode.position = CGPoint(x: size.width/2, y: size.height/2)
-        debugDrawPlayableArea()
-        startGame()
+        
+        // spawn asteroid
+        let spawnAsteroidAction = SKAction.run() { [weak self] in
+            self?.spawnAsteroid()
+        }
+        let spawnAsteroidSequence = SKAction.sequence([spawnAsteroidAction, SKAction.wait(forDuration: 2.0, withRange: 2.0)])
+        run(SKAction.repeatForever(spawnAsteroidSequence))
+        
     }
     
     func debugDrawPlayableArea() {
@@ -58,16 +76,79 @@ class GameScene: SKScene {
     
     func setupSpaceship() {
         spaceshipNode.zPosition = 1
-        spaceshipNode.position = CGPoint(x: size.width/2, y: 200)
+        spaceshipNode.position = CGPoint(x: playableRect.midX, y: playableRect.minY+150)
+        
+        let spaceshipPhysicsBody = SKPhysicsBody(texture: SKTexture(imageNamed: "spaceship"), size: spaceshipNode.size)
+        spaceshipPhysicsBody.isDynamic = true
+        spaceshipPhysicsBody.categoryBitMask = PhysicsCategory.Spaceship
+        spaceshipPhysicsBody.collisionBitMask = PhysicsCategory.Asteroid
+        spaceshipPhysicsBody.allowsRotation = false
+        spaceshipPhysicsBody.usesPreciseCollisionDetection = true
+        spaceshipPhysicsBody.mass = 100
+        spaceshipPhysicsBody.contactTestBitMask = PhysicsCategory.Asteroid
+
+        spaceshipNode.physicsBody = spaceshipPhysicsBody
+        
+        let scaleUp = SKAction.scaleX(to: 0.98, y: 1.04, duration: 0.2)
+        let scaleDown = SKAction.scaleX(to: 1.0, y: 1.0, duration: 0.2)
+        let scaleLoop = SKAction.sequence([scaleUp, scaleDown])
+        spaceshipNode.run(SKAction.repeatForever(scaleLoop))
+        
+        let boosterSprite = SKSpriteNode(imageNamed: "booster1")
+        boosterSprite.position = CGPoint(x: 0, y: -230)
+        boosterSprite.zPosition = 0
+        spaceshipNode.addChild(boosterSprite)
+        
+        let textureAtlas = SKTextureAtlas(named: "Sprites")
+        let frames = ["booster1", "booster2", "booster3"].map { textureAtlas.textureNamed($0) }
+        let animate = SKAction.animate(with: frames, timePerFrame: 0.2)
+        let forever = SKAction.repeatForever(animate)
+        boosterSprite.run(forever)
+        
         addChild(spaceshipNode)
     }
     
-    func startGame() {
-        // start debris
+    func spawnAsteroid() {
+        let imageNames = ["asteroid1", "asteroid2", "asteroid3", "asteroid4", "asteroid5"]
+        let randomNumber = CGFloat.random(min: 1, max: CGFloat(imageNames.count))
+        let asteroid = SKSpriteNode(imageNamed: imageNames[Int(randomNumber)])
+        
+        asteroid.name = "asteroid"
+        asteroid.position = CGPoint(x: CGFloat.random(min: playableRect.minX, max: playableRect.maxX), y: size.height+asteroid.size.height/2)
+        
+        let asteroidPhysicsBody = SKPhysicsBody(circleOfRadius: asteroid.size.width/2)
+        asteroidPhysicsBody.friction = 0
+        asteroidPhysicsBody.angularVelocity = CGFloat.random(min: -10, max: 10)
+        asteroidPhysicsBody.isDynamic = true
+        asteroidPhysicsBody.allowsRotation = true
+        asteroidPhysicsBody.categoryBitMask = PhysicsCategory.Asteroid
+        asteroidPhysicsBody.collisionBitMask = PhysicsCategory.Spaceship | PhysicsCategory.Asteroid | PhysicsCategory.DeadZone
+        asteroidPhysicsBody.velocity = CGVector(dx: 0, dy: -500)
+        asteroidPhysicsBody.usesPreciseCollisionDetection = true
+        asteroidPhysicsBody.restitution = 1.0
+        asteroid.physicsBody = asteroidPhysicsBody
+        
+        addChild(asteroid)
     }
     
-    func cameraShake() {
+    func setupDeadZone() {
+        let deadZone = SKShapeNode(rect: CGRect(x: 0, y: 0, width: 2000, height: 100))
+        deadZone.fillColor = .red
+        deadZone.name = "deadZone"
+        deadZone.position = CGPoint(x: 0, y: -100)
         
+        let deadZonePhysicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 2000, height: 100), center: CGPoint(x: size.width/2, y: -50))
+        deadZonePhysicsBody.categoryBitMask = PhysicsCategory.DeadZone
+        deadZonePhysicsBody.collisionBitMask = PhysicsCategory.Asteroid
+        deadZonePhysicsBody.contactTestBitMask = PhysicsCategory.Asteroid
+        deadZonePhysicsBody.isDynamic = true
+        deadZonePhysicsBody.pinned = true
+        deadZonePhysicsBody.allowsRotation = false
+        deadZonePhysicsBody.usesPreciseCollisionDetection = true
+        
+        deadZone.physicsBody = deadZonePhysicsBody
+        
+        addChild(deadZone)
     }
     
     // MARK: - Background Setup
@@ -132,11 +213,128 @@ class GameScene: SKScene {
         }
     }
     
+    // MARK: - Bounds Check
+    func boundsCheckSpaceship() {
+        let bottomLeft = CGPoint(x: playableRect.minX, y: playableRect.minY)
+        let topRight = CGPoint(x: playableRect.maxX, y: playableRect.maxY)
+        
+        if spaceshipNode.position.x <= bottomLeft.x {
+            spaceshipNode.position.x = bottomLeft.x
+            velocity.x = -velocity.x
+        }
+        if spaceshipNode.position.x >= topRight.x {
+            spaceshipNode.position.x = topRight.x
+            velocity.x = -velocity.x
+        }
+        if spaceshipNode.position.y <= bottomLeft.y {
+            spaceshipNode.position.y = bottomLeft.y
+            velocity.y = -velocity.y
+        }
+        if spaceshipNode.position.y >= topRight.y {
+            spaceshipNode.position.y = topRight.y
+            velocity.y = -velocity.y
+        }
+    }
+    
+    // MARK: - Sprite Move
+    func moveShipToward(location: CGPoint) {
+        let offset = CGPoint(x: location.x - spaceshipNode.position.x, y: location.y - spaceshipNode.position.y)
+        let length = sqrt(Double(offset.x * offset.x + offset.y * offset.y))
+        let direction = CGPoint(x: offset.x / CGFloat(length), y: offset.y / CGFloat(length))
+        velocity = CGPoint(x: direction.x * shipMovePointsPerSec, y: direction.y * shipMovePointsPerSec)
+    }
+    
+    func move(sprite: SKSpriteNode, velocity: CGPoint) {
+        let amountToMove = CGPoint(x: velocity.x * CGFloat(dt), y: velocity.y * CGFloat(dt))
+        sprite.position = CGPoint(x: sprite.position.x + amountToMove.x, y: sprite.position.y + amountToMove.y)
+    }
+    
+    // MARK: - Touches
+    func sceneTouched(touchLocation:CGPoint) {
+        let delayAction = SKAction.wait(forDuration: touchDelay)
+        let moveBlock = SKAction.run { [weak self] in
+            self?.moveShipToward(location: touchLocation)
+        }
+        print(touchDelay)
+        run(SKAction.sequence([delayAction, moveBlock]))
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        let touchLocation = touch.location(in: self)
+        sceneTouched(touchLocation: touchLocation)
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        let touchLocation = touch.location(in: self)
+        sceneTouched(touchLocation: touchLocation)
+    }
+    
     // MARK: - Update
+    var lastUpdateTime: TimeInterval = 0
+    var dt: TimeInterval = 0
+    
     override func update(_ currentTime: TimeInterval) {
+        if lastUpdateTime > 0 {
+            dt = currentTime - lastUpdateTime
+        } else {
+            dt = 0
+        }
+        lastUpdateTime = currentTime
+        
+        move(sprite: spaceshipNode, velocity: velocity)
+        
         moveBackground()
         moveSlowStars()
         moveMediumStars()
+        boundsCheckSpaceship()
+        distanceTravelled += 1
+        touchDelay = distanceTravelled * 0.0002
     }
     
+    // MARK: - Other
+    func destroyAsteroidAnimation(at position: CGPoint) {
+        guard let emitter = SKEmitterNode(fileNamed: "AsteroidBreak.sks") else { return }
+        emitter.position = position
+        addChild(emitter)
+    }
+    
+    func shake(initialPosition: CGPoint, duration:Float, amplitudeX:Int = 12, amplitudeY:Int = 3) -> SKAction {
+        let startingX = initialPosition.x
+        let startingY = initialPosition.y
+        let numberOfShakes = duration / 0.015
+        var actionsArray:[SKAction] = []
+        for _ in 1...Int(numberOfShakes) {
+            let newXPos = startingX + CGFloat(arc4random_uniform(UInt32(amplitudeX))) - CGFloat(amplitudeX / 2)
+            let newYPos = startingY + CGFloat(arc4random_uniform(UInt32(amplitudeY))) - CGFloat(amplitudeY / 2)
+            actionsArray.append(SKAction.move(to: CGPoint(x: newXPos,y: newYPos), duration: 0.015))
+        }
+        actionsArray.append(SKAction.move(to: initialPosition, duration: 0.015))
+        return SKAction.sequence(actionsArray)
+    }
+    
+}
+
+extension GameScene: SKPhysicsContactDelegate {
+    func didBegin(_ contact: SKPhysicsContact) {
+        
+        if (contact.bodyA.categoryBitMask == PhysicsCategory.DeadZone) && (contact.bodyB.categoryBitMask == PhysicsCategory.Asteroid) {
+            contact.bodyB.node?.removeFromParent()
+        }
+        
+        if (contact.bodyA.categoryBitMask == PhysicsCategory.Spaceship) && (contact.bodyB.categoryBitMask == PhysicsCategory.Asteroid) {
+            guard let explosionLocation = contact.bodyB.node?.position else { return }
+            destroyAsteroidAnimation(at: explosionLocation)
+            contact.bodyB.node?.removeFromParent()
+            cameraNode.run(shake(initialPosition: cameraNode.position, duration: 0.5, amplitudeX: 30, amplitudeY: 4))
+        }
+    }
+}
+
+struct PhysicsCategory {
+    static let None:  UInt32 = 0
+    static let Asteroid:   UInt32 = 0b1
+    static let Spaceship: UInt32 = 0b10
+    static let DeadZone:   UInt32 = 0b100
 }
