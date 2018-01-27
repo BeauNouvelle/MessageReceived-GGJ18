@@ -26,8 +26,9 @@ class GameScene: SKScene {
         }
     }
     var shipLife = 100
-
     var velocity = CGPoint.zero
+    
+    let asteroidHitSound: SKAction = SKAction.playSoundFileNamed("asteroidHit", waitForCompletion: false)
     
     override init(size: CGSize) {
         let maxAspectRatio: CGFloat = 3/4
@@ -48,7 +49,7 @@ class GameScene: SKScene {
     }
         
     override func didMove(to view: SKView) {
-        backgroundColor = SKColor.white
+        backgroundColor = SKColor.black
         
         physicsWorld.contactDelegate = self
         physicsWorld.gravity = CGVector.zero
@@ -267,7 +268,6 @@ class GameScene: SKScene {
             self?.shipRecievedMessage()
             self?.moveShipToward(location: touchLocation)
         }
-        print(touchDelay)
         run(SKAction.sequence([delayAction, moveBlock]))
     }
     
@@ -340,6 +340,10 @@ class GameScene: SKScene {
     
     func damageShip() {
         shipLife -= 20
+        run(asteroidHitSound)
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+        generator.prepare()
+        generator.impactOccurred()
         if shipLife < 0 {
             // play ship blow up animation.
             gameOver()
