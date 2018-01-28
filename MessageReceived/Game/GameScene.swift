@@ -167,7 +167,7 @@ class GameScene: SKScene {
         astronautPhysicsBody.usesPreciseCollisionDetection = true
         astronautPhysicsBody.restitution = 1.0
         astronautPhysicsBody.categoryBitMask = PhysicsCategory.Astronaut
-        astronautPhysicsBody.collisionBitMask = PhysicsCategory.Spaceship | PhysicsCategory.DeadZone
+        astronautPhysicsBody.collisionBitMask = PhysicsCategory.Spaceship | PhysicsCategory.DeadZone | PhysicsCategory.Astronaut | PhysicsCategory.Flower | PhysicsCategory.Whale
         
         astronaut.physicsBody = astronautPhysicsBody
         astronaut.position = CGPoint(x: CGFloat.random(min: playableRect.minX, max: playableRect.maxX), y: size.height+astronaut.size.height/2)

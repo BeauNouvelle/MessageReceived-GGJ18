@@ -23,7 +23,6 @@ func createAsteroid() -> SKSpriteNode {
     asteroidPhysicsBody.allowsRotation = true
     asteroidPhysicsBody.categoryBitMask = PhysicsCategory.Asteroid
     asteroidPhysicsBody.collisionBitMask = PhysicsCategory.Spaceship | PhysicsCategory.Asteroid | PhysicsCategory.DeadZone
-    asteroidPhysicsBody.contactTestBitMask = PhysicsCategory.Spaceship | PhysicsCategory.Asteroid | PhysicsCategory.DeadZone
     asteroidPhysicsBody.velocity = CGVector(dx: 0, dy: -500)
     asteroidPhysicsBody.usesPreciseCollisionDetection = true
     asteroidPhysicsBody.restitution = 1.0
@@ -31,4 +30,3 @@ func createAsteroid() -> SKSpriteNode {
     
     return asteroid
 }
-
