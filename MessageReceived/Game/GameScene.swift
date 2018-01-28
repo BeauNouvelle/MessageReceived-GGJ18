@@ -16,19 +16,20 @@ class GameScene: SKScene {
     var spaceshipNode = SKSpriteNode(imageNamed: "spaceship")
     let hud = HUD()
     
-    let shipMovePointsPerSec: CGFloat = 300
-    let shipRotateRadiansPerSec: CGFloat = 4.0 * π
+    let shipMovePointsPerSec: CGFloat = 400
     
     var touchDelay = 0.0
-    var distanceTravelled = 0.0 {
+    var distanceTravelled = 0 {
         didSet {
-            hud.distanceTravelledLabel.text = "\(distanceTravelled)"
+            hud.distanceTravelledLabel.text = "\(distanceTravelled)AU"
         }
     }
-    var shipLife = 100
+    var shipLife = 91
     var velocity = CGPoint.zero
     
     let asteroidHitSound: SKAction = SKAction.playSoundFileNamed("asteroidHit", waitForCompletion: false)
+    let pulseSound: SKAction = SKAction.playSoundFileNamed("pulse", waitForCompletion: true)
+    let sonarSound: SKAction = SKAction.playSoundFileNamed("sonar", waitForCompletion: true)
     
     override init(size: CGSize) {
         let maxAspectRatio: CGFloat = 3/4
@@ -263,12 +264,14 @@ class GameScene: SKScene {
     
     // MARK: - Touches
     func sceneTouched(touchLocation:CGPoint) {
+        drawSignal(at: touchLocation)
         let delayAction = SKAction.wait(forDuration: touchDelay)
         let moveBlock = SKAction.run { [weak self] in
             self?.shipRecievedMessage()
             self?.moveShipToward(location: touchLocation)
         }
         run(SKAction.sequence([delayAction, moveBlock]))
+        run(sonarSound)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -303,7 +306,7 @@ class GameScene: SKScene {
         boundsCheckSpaceship()
         
         distanceTravelled += 1
-        touchDelay = distanceTravelled * 0.0001
+        touchDelay = Double(distanceTravelled) * 0.0001
     }
     
     // MARK: - Actions
@@ -334,20 +337,48 @@ class GameScene: SKScene {
         pulse.position = CGPoint(x: -7, y: 170)
         pulse.name = "pulse"
         spaceshipNode.addChild(pulse)
-        let removeAction = SKAction.sequence([SKAction.wait(forDuration: 2), SKAction.removeFromParent()])
+        let removeAction = SKAction.sequence([SKAction.wait(forDuration: 1), SKAction.removeFromParent()])
         pulse.run(removeAction)
+        pulse.run(pulseSound)
     }
     
     func damageShip() {
-        shipLife -= 20
+        shipLife -= 30
         run(asteroidHitSound)
         let generator = UIImpactFeedbackGenerator(style: .medium)
         generator.prepare()
         generator.impactOccurred()
+        
+        if shipLife > 60 {
+            spaceshipNode.addChild(damage1())
+        } else if shipLife > 30 {
+            spaceshipNode.addChild(damage3())
+        } else if shipLife > 0 {
+            spaceshipNode.addChild(damage2())
+        }
+        
         if shipLife < 0 {
             // play ship blow up animation.
             gameOver()
         }
+    }
+    
+    // MARK: - Signal
+    func drawSignal(at location: CGPoint) {
+        let signalSprite = SKShapeNode(circleOfRadius: 10)
+        signalSprite.position = location
+        signalSprite.lineWidth = 1
+        signalSprite.glowWidth = 1
+        signalSprite.strokeColor = #colorLiteral(red: 0.2494468093, green: 0.7084226012, blue: 0.9994592071, alpha: 1)
+        signalSprite.name = "signal"
+        signalSprite.zPosition = 9
+        addChild(signalSprite)
+        
+        let scaleAction = SKAction.scale(by: CGFloat(touchDelay*20), duration: touchDelay)
+        let removeAction = SKAction.removeFromParent()
+        let fadeAction = SKAction.fadeAlpha(to: 0, duration: touchDelay)
+        let sequence = SKAction.sequence([SKAction.group([scaleAction,fadeAction]), removeAction])
+        signalSprite.run(sequence)
     }
     
     // MARK: - Game state
@@ -357,8 +388,11 @@ class GameScene: SKScene {
     
     func restart() {
         touchDelay = 0.0
-        distanceTravelled = 0.0
-        shipLife = 100
+        distanceTravelled = 0
+        shipLife = 91
+        spaceshipNode.enumerateChildNodes(withName: "damage") { (node, _) in
+            node.removeFromParent()
+        }
     }
     
 }
