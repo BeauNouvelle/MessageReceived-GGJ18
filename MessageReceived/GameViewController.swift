@@ -17,7 +17,7 @@ class GameViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        view.backgroundColor = .black
         let scene = GameScene(size: CGSize(width: 1536, height: 2048))
         let skView = self.view as! SKView
 //        skView.showsFPS = true
@@ -26,6 +26,11 @@ class GameViewController: UIViewController {
         scene.scaleMode = .aspectFill
         skView.presentScene(scene)
         playThemeSound()
+        setNeedsUpdateOfHomeIndicatorAutoHidden()
+    }
+    
+    override func prefersHomeIndicatorAutoHidden() -> Bool {
+        return true
     }
     
     override var shouldAutorotate: Bool {

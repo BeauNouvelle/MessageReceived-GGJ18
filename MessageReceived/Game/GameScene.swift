@@ -16,12 +16,12 @@ class GameScene: SKScene {
     var spaceshipNode = SKSpriteNode(imageNamed: "spaceship")
     let hud = HUD()
     
-    let shipMovePointsPerSec: CGFloat = 400
+    let shipMovePointsPerSec: CGFloat = 450
     
     var touchDelay = 0.0
     var distanceTravelled = 0 {
         didSet {
-            hud.distanceTravelledLabel.text = "\(distanceTravelled)AU"
+            hud.distanceTravelledLabel.text = "\(distanceTravelled/10)AU"
         }
     }
     var shipLife = 91
@@ -29,6 +29,7 @@ class GameScene: SKScene {
     
     let asteroidHitSound: SKAction = SKAction.playSoundFileNamed("asteroidHit", waitForCompletion: false)
     let rocketSound: SKAction = SKAction.playSoundFileNamed("rocket", waitForCompletion: true)
+    let astronautSound: SKAction = SKAction.playSoundFileNamed("astronaut", waitForCompletion: true)
     
     override init(size: CGSize) {
         let maxAspectRatio: CGFloat = 3/4
@@ -66,13 +67,36 @@ class GameScene: SKScene {
         camera = cameraNode
         cameraNode.position = CGPoint(x: size.width/2, y: size.height/2)
         
+        // Rocket Sound
+        run(SKAction.repeatForever(rocketSound))
+        
         // spawn asteroid
         let spawnAsteroidAction = SKAction.run() { [weak self] in
             self?.spawnAsteroid()
         }
         let spawnAsteroidSequence = SKAction.sequence([spawnAsteroidAction, SKAction.wait(forDuration: 2.0, withRange: 2.0)])
         run(SKAction.repeatForever(spawnAsteroidSequence))
-        run(SKAction.repeatForever(rocketSound))
+
+        // Spawn astronaut
+        let spawnAstronautAction = SKAction.run { [weak self] in
+            self?.spawnAstronaut()
+        }
+        let spawnAstronautSequence = SKAction.sequence([SKAction.wait(forDuration: 25, withRange: 10), spawnAstronautAction])
+        run(SKAction.repeatForever(spawnAstronautSequence))
+        
+        // Spawn Whale
+        let spawnWhale = SKAction.run { [weak self] in
+            self?.spawnWhale()
+        }
+        let spawnWhaleSequence = SKAction.sequence([SKAction.wait(forDuration: 70, withRange: 10), spawnWhale])
+        run(SKAction.repeatForever(spawnWhaleSequence))
+        
+        // Spawn Flower
+        let spawnFlower = SKAction.run { [weak self] in
+            self?.spawnFlower()
+        }
+        let spawnFlowerSequence = SKAction.sequence([SKAction.wait(forDuration: 65, withRange: 10), spawnFlower])
+        run(SKAction.repeatForever(spawnFlowerSequence))
     }
     
     func debugDrawPlayableArea() {
@@ -94,11 +118,11 @@ class GameScene: SKScene {
         let spaceshipPhysicsBody = SKPhysicsBody(texture: SKTexture(imageNamed: "spaceship"), size: spaceshipNode.size)
         spaceshipPhysicsBody.isDynamic = true
         spaceshipPhysicsBody.categoryBitMask = PhysicsCategory.Spaceship
-        spaceshipPhysicsBody.collisionBitMask = PhysicsCategory.Asteroid
+        spaceshipPhysicsBody.collisionBitMask = PhysicsCategory.Asteroid | PhysicsCategory.Whale | PhysicsCategory.Astronaut | PhysicsCategory.Flower
         spaceshipPhysicsBody.allowsRotation = false
         spaceshipPhysicsBody.usesPreciseCollisionDetection = true
         spaceshipPhysicsBody.mass = 100
-        spaceshipPhysicsBody.contactTestBitMask = PhysicsCategory.Asteroid
+        spaceshipPhysicsBody.contactTestBitMask = PhysicsCategory.Asteroid | PhysicsCategory.Astronaut | PhysicsCategory.Whale | PhysicsCategory.Flower
 
         spaceshipNode.physicsBody = spaceshipPhysicsBody
         
@@ -122,26 +146,73 @@ class GameScene: SKScene {
     }
     
     func spawnAsteroid() {
-        let imageNames = ["asteroid1", "asteroid2", "asteroid3", "asteroid4", "asteroid5"]
-        let randomNumber = CGFloat.random(min: 1, max: CGFloat(imageNames.count))
-        let asteroid = SKSpriteNode(imageNamed: imageNames[Int(randomNumber)])
-        
-        asteroid.name = "asteroid"
+        let asteroid = createAsteroid()
         asteroid.position = CGPoint(x: CGFloat.random(min: playableRect.minX, max: playableRect.maxX), y: size.height+asteroid.size.height/2)
-        
-        let asteroidPhysicsBody = SKPhysicsBody(circleOfRadius: asteroid.size.width/2)
-        asteroidPhysicsBody.friction = 0
-        asteroidPhysicsBody.angularVelocity = CGFloat.random(min: -10, max: 10)
-        asteroidPhysicsBody.isDynamic = true
-        asteroidPhysicsBody.allowsRotation = true
-        asteroidPhysicsBody.categoryBitMask = PhysicsCategory.Asteroid
-        asteroidPhysicsBody.collisionBitMask = PhysicsCategory.Spaceship | PhysicsCategory.Asteroid | PhysicsCategory.DeadZone
-        asteroidPhysicsBody.velocity = CGVector(dx: 0, dy: -500)
-        asteroidPhysicsBody.usesPreciseCollisionDetection = true
-        asteroidPhysicsBody.restitution = 1.0
-        asteroid.physicsBody = asteroidPhysicsBody
-        
         addChild(asteroid)
+    }
+    
+    func spawnAstronaut() {
+        let imageNames = ["astronaut1", "astronaut2"]
+        let randomNumber = CGFloat.random(min: 0, max: CGFloat(imageNames.count)-1)
+        
+        let astronaut = SKSpriteNode(imageNamed: imageNames[Int(randomNumber)])
+        astronaut.name = "astronaut"
+        
+        let astronautPhysicsBody = SKPhysicsBody(circleOfRadius: astronaut.size.width/2)
+        astronautPhysicsBody.friction = 0
+        astronautPhysicsBody.angularVelocity = CGFloat.random(min: -2, max: 2)
+        astronautPhysicsBody.isDynamic = true
+        astronautPhysicsBody.allowsRotation = true
+        astronautPhysicsBody.velocity = CGVector(dx: 0, dy: -200)
+        astronautPhysicsBody.usesPreciseCollisionDetection = true
+        astronautPhysicsBody.restitution = 1.0
+        astronautPhysicsBody.categoryBitMask = PhysicsCategory.Astronaut
+        astronautPhysicsBody.collisionBitMask = PhysicsCategory.Spaceship | PhysicsCategory.DeadZone
+        
+        astronaut.physicsBody = astronautPhysicsBody
+        astronaut.position = CGPoint(x: CGFloat.random(min: playableRect.minX, max: playableRect.maxX), y: size.height+astronaut.size.height/2)
+
+        addChild(astronaut)
+    }
+    
+    func spawnWhale() {
+        let whale = SKSpriteNode(imageNamed: "whale")
+        whale.name = "whale"
+        
+        let whalePhysicsBody = SKPhysicsBody(circleOfRadius: whale.size.width/2)
+        whalePhysicsBody.friction = 0
+        whalePhysicsBody.angularVelocity = CGFloat.random(min: -5, max: 5)
+        whalePhysicsBody.isDynamic = true
+        whalePhysicsBody.allowsRotation = true
+        whalePhysicsBody.velocity = CGVector(dx: 0, dy: -300)
+        whalePhysicsBody.usesPreciseCollisionDetection = true
+        whalePhysicsBody.restitution = 1.0
+        whalePhysicsBody.categoryBitMask = PhysicsCategory.Whale
+        whalePhysicsBody.collisionBitMask = PhysicsCategory.Spaceship | PhysicsCategory.DeadZone
+        
+        whale.physicsBody = whalePhysicsBody
+        whale.position = CGPoint(x: CGFloat.random(min: playableRect.minX, max: playableRect.maxX), y: size.height+whale.size.height/2)
+        addChild(whale)
+    }
+    
+    func spawnFlower() {
+        let flower = SKSpriteNode(imageNamed: "flower")
+        flower.name = "flower"
+        
+        let flowerPhysicsBody = SKPhysicsBody(circleOfRadius: flower.size.width/2)
+        flowerPhysicsBody.friction = 0
+        flowerPhysicsBody.angularVelocity = CGFloat.random(min: -3, max: 3)
+        flowerPhysicsBody.isDynamic = true
+        flowerPhysicsBody.allowsRotation = true
+        flowerPhysicsBody.velocity = CGVector(dx: 0, dy: -100)
+        flowerPhysicsBody.usesPreciseCollisionDetection = true
+        flowerPhysicsBody.restitution = 1.0
+        flowerPhysicsBody.categoryBitMask = PhysicsCategory.Flower
+        flowerPhysicsBody.collisionBitMask = PhysicsCategory.Spaceship | PhysicsCategory.DeadZone
+        
+        flower.physicsBody = flowerPhysicsBody
+        flower.position = CGPoint(x: CGFloat.random(min: playableRect.minX, max: playableRect.maxX), y: size.height+flower.size.height/2)
+        addChild(flower)
     }
     
     func setupDeadZone() {
@@ -402,6 +473,18 @@ extension GameScene: SKPhysicsContactDelegate {
             contact.bodyB.node?.removeFromParent()
         }
         
+        if (contact.bodyA.categoryBitMask == PhysicsCategory.DeadZone) && (contact.bodyB.categoryBitMask == PhysicsCategory.Whale) {
+            contact.bodyB.node?.removeFromParent()
+        }
+        
+        if (contact.bodyA.categoryBitMask == PhysicsCategory.DeadZone) && (contact.bodyB.categoryBitMask == PhysicsCategory.Flower) {
+            contact.bodyB.node?.removeFromParent()
+        }
+        
+        if (contact.bodyA.categoryBitMask == PhysicsCategory.DeadZone) && (contact.bodyB.categoryBitMask == PhysicsCategory.Astronaut) {
+            contact.bodyB.node?.removeFromParent()
+        }
+        
         if (contact.bodyA.categoryBitMask == PhysicsCategory.Spaceship) && (contact.bodyB.categoryBitMask == PhysicsCategory.Asteroid) {
             guard let explosionLocation = contact.bodyB.node?.position else { return }
             destroyAsteroidAnimation(at: explosionLocation)
@@ -409,12 +492,30 @@ extension GameScene: SKPhysicsContactDelegate {
             cameraNode.run(shake(initialPosition: cameraNode.position, duration: 0.5, amplitudeX: 30, amplitudeY: 4))
             damageShip()
         }
+        
+        if (contact.bodyA.categoryBitMask == PhysicsCategory.Asteroid) && (contact.bodyB.categoryBitMask == PhysicsCategory.Asteroid) {
+            guard let explosionLocation = contact.bodyB.node?.position else { return }
+            destroyAsteroidAnimation(at: explosionLocation)
+            contact.bodyB.node?.removeFromParent()
+        }
+        
+        if (contact.bodyA.categoryBitMask == PhysicsCategory.Spaceship) && (contact.bodyB.categoryBitMask == PhysicsCategory.Astronaut) {
+            contact.bodyB.node?.run(astronautSound)
+        }
+        
+//        if (contact.bodyA.categoryBitMask == PhysicsCategory.Spaceship) && (contact.bodyB.categoryBitMask == PhysicsCategory.Whale) {
+//            contact.bodyB.node?.run(whaleSound)
+//        }
+        
     }
 }
 
 struct PhysicsCategory {
-    static let None:  UInt32 = 0
-    static let Asteroid:   UInt32 = 0b1
-    static let Spaceship: UInt32 = 0b10
-    static let DeadZone:   UInt32 = 0b100
+    static let None: UInt32 = 0x1 << 1
+    static let Asteroid: UInt32 = 0x1 << 2
+    static let Spaceship: UInt32 = 0x1 << 3
+    static let DeadZone: UInt32 = 0x1 << 4
+    static let Astronaut: UInt32 = 0x1 << 5
+    static let Flower: UInt32 = 0x1 << 6
+    static let Whale: UInt32 = 0x1 << 7
 }

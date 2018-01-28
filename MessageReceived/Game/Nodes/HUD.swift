@@ -20,7 +20,7 @@ class HUD: SKNode {
         
         distanceTravelledLabel.position = CGPoint(x: 0, y: 0)
         distanceTravelledLabel.fontColor = .white
-        distanceTravelledLabel.fontSize = 40
+        distanceTravelledLabel.fontSize = 60
         addChild(distanceTravelledLabel)
     }
     

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8B22BBB2201D6C5C005B854A /* Asteroids.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B22BBB1201D6C5C005B854A /* Asteroids.swift */; };
+		8B22BBB6201D70E6005B854A /* astronaut.wav in Resources */ = {isa = PBXBuildFile; fileRef = 8B22BBB5201D70E6005B854A /* astronaut.wav */; };
 		8B798C0B201B38FC00433828 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B798C0A201B38FC00433828 /* AppDelegate.swift */; };
 		8B798C0F201B38FC00433828 /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 8B798C0E201B38FC00433828 /* Actions.sks */; };
 		8B798C11201B38FC00433828 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B798C10201B38FC00433828 /* GameScene.swift */; };
@@ -29,7 +31,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		8B798C07201B38FC00433828 /* MessageReceived.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MessageReceived.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8B22BBB1201D6C5C005B854A /* Asteroids.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Asteroids.swift; sourceTree = "<group>"; };
+		8B22BBB5201D70E6005B854A /* astronaut.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = astronaut.wav; sourceTree = "<group>"; };
+		8B798C07201B38FC00433828 /* Message Received.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Message Received.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B798C0A201B38FC00433828 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8B798C0E201B38FC00433828 /* Actions.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Actions.sks; sourceTree = "<group>"; };
 		8B798C10201B38FC00433828 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
@@ -74,7 +78,7 @@
 		8B798C08201B38FC00433828 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8B798C07201B38FC00433828 /* MessageReceived.app */,
+				8B798C07201B38FC00433828 /* Message Received.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -104,6 +108,7 @@
 				8B798C24201BE2D100433828 /* BackgroundNodes.swift */,
 				8B798C26201BEAB900433828 /* HUD.swift */,
 				8BE3AF19201D4F70005C207E /* Damage.swift */,
+				8B22BBB1201D6C5C005B854A /* Asteroids.swift */,
 			);
 			path = Nodes;
 			sourceTree = "<group>";
@@ -140,6 +145,7 @@
 		8BE3AF11201C9A64005C207E /* SoundEffects */ = {
 			isa = PBXGroup;
 			children = (
+				8B22BBB5201D70E6005B854A /* astronaut.wav */,
 				8BE3AF12201C9A73005C207E /* asteroidHit.wav */,
 				8BE3AF1F201D61CC005C207E /* rocket.wav */,
 			);
@@ -171,7 +177,7 @@
 			);
 			name = MessageReceived;
 			productName = MessageReceived;
-			productReference = 8B798C07201B38FC00433828 /* MessageReceived.app */;
+			productReference = 8B798C07201B38FC00433828 /* Message Received.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -219,6 +225,7 @@
 				8B798C18201B38FC00433828 /* Assets.xcassets in Resources */,
 				8B798C2B201BEB4C00433828 /* Streak.sks in Resources */,
 				8BE3AF20201D61CD005C207E /* rocket.wav in Resources */,
+				8B22BBB6201D70E6005B854A /* astronaut.wav in Resources */,
 				8B798C1B201B38FC00433828 /* LaunchScreen.storyboard in Resources */,
 				8B798C2C201BEB4C00433828 /* Assets.xcassets in Resources */,
 				8BE3AF0A201C71FA005C207E /* MessageReceived.sks in Resources */,
@@ -240,6 +247,7 @@
 				8B798C25201BE2D100433828 /* BackgroundNodes.swift in Sources */,
 				8B798C13201B38FC00433828 /* GameViewController.swift in Sources */,
 				8BE3AF06201C4DD1005C207E /* MyUtils.swift in Sources */,
+				8B22BBB2201D6C5C005B854A /* Asteroids.swift in Sources */,
 				8BE3AF1A201D4F70005C207E /* Damage.swift in Sources */,
 				8B798C0B201B38FC00433828 /* AppDelegate.swift in Sources */,
 			);
@@ -383,7 +391,7 @@
 				INFOPLIST_FILE = MessageReceived/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = pearPi.MessageReceived;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Message Received";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -398,7 +406,7 @@
 				INFOPLIST_FILE = MessageReceived/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = pearPi.MessageReceived;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Message Received";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
