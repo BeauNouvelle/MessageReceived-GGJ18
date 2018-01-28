@@ -28,8 +28,7 @@ class GameScene: SKScene {
     var velocity = CGPoint.zero
     
     let asteroidHitSound: SKAction = SKAction.playSoundFileNamed("asteroidHit", waitForCompletion: false)
-    let pulseSound: SKAction = SKAction.playSoundFileNamed("pulse", waitForCompletion: true)
-    let sonarSound: SKAction = SKAction.playSoundFileNamed("sonar", waitForCompletion: true)
+    let rocketSound: SKAction = SKAction.playSoundFileNamed("rocket", waitForCompletion: true)
     
     override init(size: CGSize) {
         let maxAspectRatio: CGFloat = 3/4
@@ -73,6 +72,7 @@ class GameScene: SKScene {
         }
         let spawnAsteroidSequence = SKAction.sequence([spawnAsteroidAction, SKAction.wait(forDuration: 2.0, withRange: 2.0)])
         run(SKAction.repeatForever(spawnAsteroidSequence))
+        run(SKAction.repeatForever(rocketSound))
     }
     
     func debugDrawPlayableArea() {
@@ -271,7 +271,6 @@ class GameScene: SKScene {
             self?.moveShipToward(location: touchLocation)
         }
         run(SKAction.sequence([delayAction, moveBlock]))
-        run(sonarSound)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -339,7 +338,6 @@ class GameScene: SKScene {
         spaceshipNode.addChild(pulse)
         let removeAction = SKAction.sequence([SKAction.wait(forDuration: 1), SKAction.removeFromParent()])
         pulse.run(removeAction)
-        pulse.run(pulseSound)
     }
     
     func damageShip() {

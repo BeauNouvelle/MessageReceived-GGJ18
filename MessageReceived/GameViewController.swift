@@ -20,8 +20,8 @@ class GameViewController: UIViewController {
         
         let scene = GameScene(size: CGSize(width: 1536, height: 2048))
         let skView = self.view as! SKView
-        skView.showsFPS = true
-        skView.showsNodeCount = true
+//        skView.showsFPS = true
+//        skView.showsNodeCount = true
         skView.ignoresSiblingOrder = true
         scene.scaleMode = .aspectFill
         skView.presentScene(scene)
@@ -48,7 +48,7 @@ class GameViewController: UIViewController {
             player = try! AVAudioPlayer(contentsOf: music)
             player.numberOfLoops = -1
             player.prepareToPlay()
-            player.volume = 0.3
+            player.volume = 0.5
             player.play()
         }
     }

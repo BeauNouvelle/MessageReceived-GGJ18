@@ -25,8 +25,7 @@
 		8BE3AF13201C9A73005C207E /* asteroidHit.wav in Resources */ = {isa = PBXBuildFile; fileRef = 8BE3AF12201C9A73005C207E /* asteroidHit.wav */; };
 		8BE3AF18201CA830005C207E /* music.wav in Resources */ = {isa = PBXBuildFile; fileRef = 8BE3AF17201CA830005C207E /* music.wav */; };
 		8BE3AF1A201D4F70005C207E /* Damage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE3AF19201D4F70005C207E /* Damage.swift */; };
-		8BE3AF1C201D5E0D005C207E /* signal.wav in Resources */ = {isa = PBXBuildFile; fileRef = 8BE3AF1B201D5E0C005C207E /* signal.wav */; };
-		8BE3AF1E201D6020005C207E /* pulse.wav in Resources */ = {isa = PBXBuildFile; fileRef = 8BE3AF1D201D6020005C207E /* pulse.wav */; };
+		8BE3AF20201D61CD005C207E /* rocket.wav in Resources */ = {isa = PBXBuildFile; fileRef = 8BE3AF1F201D61CC005C207E /* rocket.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,8 +49,7 @@
 		8BE3AF12201C9A73005C207E /* asteroidHit.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = asteroidHit.wav; sourceTree = "<group>"; };
 		8BE3AF17201CA830005C207E /* music.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = music.wav; sourceTree = "<group>"; };
 		8BE3AF19201D4F70005C207E /* Damage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Damage.swift; sourceTree = "<group>"; };
-		8BE3AF1B201D5E0C005C207E /* signal.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = signal.wav; sourceTree = "<group>"; };
-		8BE3AF1D201D6020005C207E /* pulse.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = pulse.wav; sourceTree = "<group>"; };
+		8BE3AF1F201D61CC005C207E /* rocket.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = rocket.wav; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -142,9 +140,8 @@
 		8BE3AF11201C9A64005C207E /* SoundEffects */ = {
 			isa = PBXGroup;
 			children = (
-				8BE3AF1D201D6020005C207E /* pulse.wav */,
-				8BE3AF1B201D5E0C005C207E /* signal.wav */,
 				8BE3AF12201C9A73005C207E /* asteroidHit.wav */,
+				8BE3AF1F201D61CC005C207E /* rocket.wav */,
 			);
 			path = SoundEffects;
 			sourceTree = "<group>";
@@ -221,12 +218,11 @@
 				8BE3AF08201C6633005C207E /* AsteroidBreak.sks in Resources */,
 				8B798C18201B38FC00433828 /* Assets.xcassets in Resources */,
 				8B798C2B201BEB4C00433828 /* Streak.sks in Resources */,
+				8BE3AF20201D61CD005C207E /* rocket.wav in Resources */,
 				8B798C1B201B38FC00433828 /* LaunchScreen.storyboard in Resources */,
 				8B798C2C201BEB4C00433828 /* Assets.xcassets in Resources */,
 				8BE3AF0A201C71FA005C207E /* MessageReceived.sks in Resources */,
-				8BE3AF1C201D5E0D005C207E /* signal.wav in Resources */,
 				8B798C0F201B38FC00433828 /* Actions.sks in Resources */,
-				8BE3AF1E201D6020005C207E /* pulse.wav in Resources */,
 				8BE3AF13201C9A73005C207E /* asteroidHit.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
