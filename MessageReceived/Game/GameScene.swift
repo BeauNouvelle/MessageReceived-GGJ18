@@ -167,7 +167,7 @@ class GameScene: SKScene {
         astronautPhysicsBody.usesPreciseCollisionDetection = true
         astronautPhysicsBody.restitution = 1.0
         astronautPhysicsBody.categoryBitMask = PhysicsCategory.Astronaut
-        astronautPhysicsBody.collisionBitMask = PhysicsCategory.Spaceship | PhysicsCategory.DeadZone | PhysicsCategory.Astronaut | PhysicsCategory.Flower | PhysicsCategory.Whale
+        astronautPhysicsBody.collisionBitMask = PhysicsCategory.Spaceship | PhysicsCategory.DeadZone
         
         astronaut.physicsBody = astronautPhysicsBody
         astronaut.position = CGPoint(x: CGFloat.random(min: playableRect.minX, max: playableRect.maxX), y: size.height+astronaut.size.height/2)
@@ -224,7 +224,7 @@ class GameScene: SKScene {
         let deadZonePhysicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 2000, height: 100), center: CGPoint(x: size.width/2, y: -50))
         deadZonePhysicsBody.categoryBitMask = PhysicsCategory.DeadZone
         deadZonePhysicsBody.collisionBitMask = PhysicsCategory.Asteroid
-        deadZonePhysicsBody.contactTestBitMask = PhysicsCategory.Asteroid
+        deadZonePhysicsBody.contactTestBitMask = PhysicsCategory.Asteroid | PhysicsCategory.Astronaut | PhysicsCategory.Whale | PhysicsCategory.Flower
         deadZonePhysicsBody.isDynamic = true
         deadZonePhysicsBody.pinned = true
         deadZonePhysicsBody.allowsRotation = false
